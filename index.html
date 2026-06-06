@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>جرد المستودعات</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="/manifest.json">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Cairo',sans-serif;background:#0f1923;color:#e8f0fe;min-height:100vh;direction: rtl;}
@@ -28,7 +29,7 @@
   .grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;}
   .card {background: #162030; border: 1px solid #253545; padding: 15px; border-radius: 8px; text-align: center;}
   .card h3 {font-size: 12px; color: #8fa3b8; margin-bottom: 5px;}
-  .card .num {font-size: 20px; font-weight: 700; color: #00c9a7;}
+  .card .num {font-size: 20px; font-weight: 700; color:#00c9a7;}
 
   /* النوافذ والنموذج */
   .form-group {margin-bottom: 12px;}
@@ -183,19 +184,16 @@ function ST(pageId, tabEl) {
   
   document.getElementById(pageId).classList.add('active');
   tabEl.classList.add('active');
-  RA(); // إعادة تحديث الواجهات والبيانات المعروضة
+  RA(); 
 }
 
 // إعادة عرض الحقول والجداول وتحديث الإحصائيات (Render All)
 function RA(){
-  // تحديث نصوص الهيدر المخصصة بالإعدادات
   document.getElementById('cn').textContent = (db.cfg.co || 'شركتك') + ' — ' + (db.cfg.wo || 'المستودع الرئيسي');
   
-  // تحديث إعدادات المدخلات
   document.getElementById('c-co').value = db.cfg.co;
   document.getElementById('c-wo').value = db.cfg.wo;
 
-  // تحديث قوائم الاختيار (Select Options)
   const catSelect = document.getElementById('p-cat');
   catSelect.innerHTML = '';
   db.cats.forEach(c => catSelect.innerHTML += `<option value="${c}">${c}</option>`);
@@ -204,7 +202,6 @@ function RA(){
   itemSelect.innerHTML = '';
   db.items.forEach((item, index) => itemSelect.innerHTML += `<option value="${index}">${item.name}</option>`);
 
-  // حساب وتحديث الإحصائيات بالرئيسية
   document.getElementById('stat-items').textContent = db.items.length;
   let totalQty = 0;
   let warnCount = 0;
@@ -215,7 +212,6 @@ function RA(){
   document.getElementById('stat-qty').textContent = totalQty;
   document.getElementById('stat-warn').textContent = warnCount;
 
-  // بناء جدول المخزون
   const invTable = document.getElementById('inv-table');
   invTable.innerHTML = '';
   db.items.forEach((item, index) => {
@@ -230,7 +226,6 @@ function RA(){
       </tr>`;
   });
 
-  // بناء جدول الحركات (التقرير)
   const repTable = document.getElementById('rep-table');
   repTable.innerHTML = '';
   db.movs.slice().reverse().forEach(m => {
@@ -239,7 +234,6 @@ function RA(){
   });
 }
 
-// إضافة مادة جديدة للمخزن
 function addItem(){
   const name = document.getElementById('p-name').value.trim();
   const cat = document.getElementById('p-cat').value;
@@ -251,13 +245,11 @@ function addItem(){
   db.items.push({name, cat, qty, min});
   SV(); RA();
   
-  // إعادة تصفير الحقول المكتوبة
   document.getElementById('p-name').value = '';
   document.getElementById('p-qty').value = '0';
   alert('تمت إضافة المادة بنجاح!');
 }
 
-// حذف مادة
 function deleteItem(index){
   if(confirm('هل أنت متأكد من حذف هذه المادة نهائياً؟')) {
     db.items.splice(index, 1);
@@ -265,7 +257,6 @@ function deleteItem(index){
   }
 }
 
-// تسجيل حركة وارد أو صادر
 function addMovement(){
   const itemIndex = document.getElementById('m-item').value;
   const type = document.getElementById('m-type').value;
@@ -280,10 +271,8 @@ function addMovement(){
     return;
   }
 
-  // تعديل الكمية بالمخزن
   if(type === 'وارد') { item.qty += qty; } else { item.qty -= qty; }
 
-  // تسجيل الحركة بالتقرير
   const dateStr = new Date().toLocaleDateString('ar-SA', {hour:'2-digit', minute:'2-digit'});
   db.movs.push({date: dateStr, name: item.name, type: type, qty: qty});
 
@@ -291,7 +280,6 @@ function addMovement(){
   alert('تم تسجيل الحركة بنجاح وتحديث الكميات!');
 }
 
-// حفظ الإعدادات العامة
 function saveSettings(){
   db.cfg.co = document.getElementById('c-co').value;
   db.cfg.wo = document.getElementById('c-wo').value;
@@ -299,7 +287,6 @@ function saveSettings(){
   alert('تم حفظ الإعدادات!');
 }
 
-// مسح شامل لكل البيانات
 function clearAllData(){
   if(confirm('تحذير! سيتم حذف كل المواد المسجلة والحركات المسجلة نهائياً.')){
     localStorage.removeItem('wdb');
@@ -308,9 +295,16 @@ function clearAllData(){
   }
 }
 
-// تشغيل عند التحميل لأول مرة
 init();
-</script>
 
+// تفعيل وتثبيت الـ Service Worker ليعمل التطبيق بدون إنترنت (Offline PWA)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('تم تسجيل الـ Service Worker بنجاح!', reg))
+      .catch(err => console.error('فشل تسجيل الـ Service Worker:', err));
+  });
+}
+</script>
 </body>
 </html>
