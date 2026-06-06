@@ -4,17 +4,51 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>جرد المستودعات</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Cairo',sans-serif;background:#0f1923;color:#e8f0fe;min-height:100vh}
-.h{background:#162030;border-bottom:1px solid #253545;padding:14px 16px;position:sticky;top:0;z-index:99;display:flex;justify-content:space-between;align-items:center}
-.ht{font-size:17px;font-weight:700;color:#00c9a7}
-.hs{font-size:11px;color:#8fa3b8}
-.tabs{display:flex;background:#162030;border-bottom:1px solid #253545;overflow-x:auto}
-.tab{flex:1;min-width:70px;padding:10px 6px;text-align:center;font-size:11px;font-weight:600;color:#8fa3b8;cursor:pointer;border-bottom:2px solid transparent}
-.tab.active{color:#00c9a7;border-bottom-color:#00c9a7}
-/* أضف باقي CSS كما في الكود الأصلي هنا */
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Cairo',sans-serif;background:#0f1923;color:#e8f0fe;min-height:100vh;direction: rtl;}
+  
+  /* الهيدر */
+  .h{background:#162030;border-bottom:1px solid #253545;padding:14px 16px;position:sticky;top:0;z-index:99;display:flex;justify-content:space-between;align-items:center}
+  .ht{font-size:17px;font-weight:700;color:#00c9a7}
+  .hs{font-size:11px;color:#8fa3b8}
+  
+  /* التبويبات */
+  .tabs{display:flex;background:#162030;border-bottom:1px solid #253545;overflow-x:auto}
+  .tab{flex:1;min-width:70px;padding:12px 6px;text-align:center;font-size:12px;font-weight:600;color:#8fa3b8;cursor:pointer;border-bottom:2px solid transparent;transition: 0.3s;}
+  .tab.active{color:#00c9a7;border-bottom-color:#00c9a7;background: #1c293a;}
+  .tab .ti {margin-left: 5px;}
+
+  /* محتوى الصفحات */
+  .page {display: none; padding: 15px;}
+  .page.active {display: block;}
+  
+  /* الكروت والإحصائيات */
+  .grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;}
+  .card {background: #162030; border: 1px solid #253545; padding: 15px; border-radius: 8px; text-align: center;}
+  .card h3 {font-size: 12px; color: #8fa3b8; margin-bottom: 5px;}
+  .card .num {font-size: 20px; font-weight: 700; color: #00c9a7;}
+
+  /* النوافذ والنموذج */
+  .form-group {margin-bottom: 12px;}
+  .form-group label {display: block; font-size: 12px; color: #8fa3b8; margin-bottom: 5px;}
+  input, select, button {width: 100%; padding: 10px; background: #162030; border: 1px solid #253545; color: #e8f0fe; border-radius: 6px; font-family: 'Cairo', sans-serif; font-size: 13px;}
+  input:focus, select:focus {outline: none; border-color: #00c9a7;}
+  button {background: #00c9a7; color: #0f1923; font-weight: 700; cursor: pointer; border: none; margin-top: 5px;}
+  button:hover {background: #00b395;}
+  .btn-sec {background: #253545; color: #e8f0fe; margin-top: 5px;}
+
+  /* الجداول */
+  .table-container {overflow-x: auto; background: #162030; border: 1px solid #253545; border-radius: 8px; margin-top: 15px;}
+  table {width: 100%; border-collapse: collapse; text-align: right; font-size: 13px;}
+  th, td {padding: 12px; border-bottom: 1px solid #253545;}
+  th {background: #1c293a; color: #8fa3b8; font-weight: 600;}
+  tr:last-child td {border: none;}
+  .badge {padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold;}
+  .badge.in {background: rgba(0,201,167,0.2); color: #00c9a7;}
+  .badge.out {background: rgba(255,107,107,0.2); color: #ff6b6b;}
+  .badge.warn {background: rgba(255,159,67,0.2); color: #ff9f43;}
 </style>
 </head>
 <body>
@@ -24,7 +58,7 @@ body{font-family:'Cairo',sans-serif;background:#0f1923;color:#e8f0fe;min-height:
     <div class="ht">🏭 جرد المستودعات</div>
     <div class="hs" id="cn">شركتك — المستودع الرئيسي</div>
   </div>
-  <div id="hd" style="font-size:10px;color:#8fa3b8"></div>
+  <div id="hd" style="font-size:11px;color:#8fa3b8"></div>
 </div>
 
 <div class="tabs">
@@ -35,17 +69,246 @@ body{font-family:'Cairo',sans-serif;background:#0f1923;color:#e8f0fe;min-height:
   <div class="tab" onclick="ST('set',this)"><span class="ti">⚙️</span>إعدادات</div>
 </div>
 
-<!-- أضف باقي الصفحات والمودالز كما في الكود الأصلي -->
+<div id="db" class="page active">
+  <div class="grid">
+    <div class="card"><h3>إجمالي المواد</h3><div class="num" id="stat-items">0</div></div>
+    <div class="card"><h3>إجمالي القطع المتوفرة</h3><div class="num" id="stat-qty">0</div></div>
+    <div class="card"><h3>مواد منخفضة المخزون</h3><div class="num" id="stat-warn" style="color:#ff9f43">0</div></div>
+  </div>
+  <h3 style="font-size:14px; margin-bottom:10px;">إضافة سريعة لمادة</h3>
+  <div style="background:#162030; padding:15px; border-radius:8px; border:1px solid #253545;">
+    <div class="form-group"><label>اسم المادة</label><input type="text" id="p-name" placeholder="مثال: كابل نحاسي"></div>
+    <div class="form-group">
+      <label>التصنيف</label>
+      <select id="p-cat"></select>
+    </div>
+    <div class="form-group"><label>الكمية الابتدائية</label><input type="number" id="p-qty" value="0"></div>
+    <div class="form-group"><label>حد الطلب الأدنى</label><input type="number" id="p-min" value="5"></div>
+    <button onclick="addItem()">حفظ المادة الجديدة</button>
+  </div>
+</div>
+
+<div id="inv" class="page">
+  <h3 style="font-size:15px;">قائمة المواد بالمخزن</h3>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr><th>المادة</th><th>التصنيف</th><th>الكمية</th><th>الحد الأدنى</th><th>الإجراءات</th></tr>
+      </thead>
+      <tbody id="inv-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="mov" class="page">
+  <h3 style="font-size:15px; margin-bottom:10px;">تسجيل حركة مخزنية</h3>
+  <div style="background:#162030; padding:15px; border-radius:8px; border:1px solid #253545; margin-bottom:15px;">
+    <div class="form-group">
+      <label>المادة</label>
+      <select id="m-item"></select>
+    </div>
+    <div class="form-group">
+      <label>نوع الحركة</label>
+      <select id="m-type">
+        <option value="وارد">وارد (+)</option>
+        <option value="صادر">صادر (-)</option>
+      </select>
+    </div>
+    <div class="form-group"><label>الكمية</label><input type="number" id="m-qty" value="1"></div>
+    <button onclick="addMovement()">تسجيل الحركة</button>
+  </div>
+</div>
+
+<div id="rep" class="page">
+  <h3 style="font-size:15px;">سجل الحركات الأخير</h3>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr><th>التاريخ</th><th>المادة</th><th>النوع</th><th>الكمية</th></tr>
+      </thead>
+      <tbody id="rep-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="set" class="page">
+  <h3 style="font-size:15px; margin-bottom:10px;">إعدادات النظام</h3>
+  <div style="background:#162030; padding:15px; border-radius:8px; border:1px solid #253545;">
+    <div class="form-group"><label>اسم الشركة</label><input type="text" id="c-co"></div>
+    <div class="form-group"><label>اسم المستودع</label><input type="text" id="c-wo"></div>
+    <button onclick="saveSettings()">حفظ التعديلات</button>
+    <button onclick="clearAllData()" class="btn-sec" style="background:#ff6b6b; color:#fff;">مسح كافة البيانات وإعادة ضبط</button>
+  </div>
+</div>
 
 <script>
-let db={items:[],cats:['عام','مواد خام','معدات','مستلزمات','قطع غيار'],movs:[],cfg:{co:'شركتك',wo:'المستودع الرئيسي',mo:'',dm:10}};
-let cf='all',mf='all';
-function init(){LD();SD();RA();PCC();USC();}
-function SD(){const n=new Date();document.getElementById('hd').textContent=n.toLocaleDateString('ar-SA',{month:'short',day:'numeric'});}
-function LD(){const s=localStorage.getItem('wdb');if(s)try{db=JSON.parse(s);}catch(e){}}
-function SV(){localStorage.setItem('wdb',JSON.stringify(db));}
-function RA(){UD();RI();RMV();RR();US();document.getElementById('cn').textContent=db.cfg.co+' — '+db.cfg.wo;}
-/* أضف باقي JS الخاص بإدارة المخزون والحركات كما في الكود الأصلي */
+// قاعدة البيانات الافتراضية
+let db = {
+  items: [],
+  cats: ['عام', 'مواد خام', 'معدات', 'مستلزمات', 'قطع غيار'],
+  movs: [],
+  cfg: {co: 'شركتك', wo: 'المستودع الرئيسي'}
+};
+
+// تشغيل النظام عند تحميل الصفحة
+function init(){
+  LD(); 
+  SD(); 
+  RA(); 
+}
+
+// تحديث التاريخ في الهيدر
+function SD(){
+  const n = new Date();
+  document.getElementById('hd').textContent = n.toLocaleDateString('ar-SA', {month:'short', day:'numeric', year:'numeric'});
+}
+
+// تحميل البيانات من الـ LocalStorage
+function LD(){
+  const s = localStorage.getItem('wdb');
+  if(s) {
+    try { db = JSON.parse(s); } catch(e) { console.error("خطأ في قراءة البيانات"); }
+  }
+}
+
+// حفظ البيانات في الـ LocalStorage
+function SV(){
+  localStorage.setItem('wdb', JSON.stringify(db));
+}
+
+// التبديل بين التبويبات (Pages)
+function ST(pageId, tabEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  
+  document.getElementById(pageId).classList.add('active');
+  tabEl.classList.add('active');
+  RA(); // إعادة تحديث الواجهات والبيانات المعروضة
+}
+
+// إعادة عرض الحقول والجداول وتحديث الإحصائيات (Render All)
+function RA(){
+  // تحديث نصوص الهيدر المخصصة بالإعدادات
+  document.getElementById('cn').textContent = (db.cfg.co || 'شركتك') + ' — ' + (db.cfg.wo || 'المستودع الرئيسي');
+  
+  // تحديث إعدادات المدخلات
+  document.getElementById('c-co').value = db.cfg.co;
+  document.getElementById('c-wo').value = db.cfg.wo;
+
+  // تحديث قوائم الاختيار (Select Options)
+  const catSelect = document.getElementById('p-cat');
+  catSelect.innerHTML = '';
+  db.cats.forEach(c => catSelect.innerHTML += `<option value="${c}">${c}</option>`);
+
+  const itemSelect = document.getElementById('m-item');
+  itemSelect.innerHTML = '';
+  db.items.forEach((item, index) => itemSelect.innerHTML += `<option value="${index}">${item.name}</option>`);
+
+  // حساب وتحديث الإحصائيات بالرئيسية
+  document.getElementById('stat-items').textContent = db.items.length;
+  let totalQty = 0;
+  let warnCount = 0;
+  db.items.forEach(i => {
+    totalQty += parseInt(i.qty);
+    if(parseInt(i.qty) <= parseInt(i.min)) warnCount++;
+  });
+  document.getElementById('stat-qty').textContent = totalQty;
+  document.getElementById('stat-warn').textContent = warnCount;
+
+  // بناء جدول المخزون
+  const invTable = document.getElementById('inv-table');
+  invTable.innerHTML = '';
+  db.items.forEach((item, index) => {
+    let statusBadge = parseInt(item.qty) <= parseInt(item.min) ? '<span class="badge warn">منخفض</span>' : '';
+    invTable.innerHTML += `
+      <tr>
+        <td>${item.name} ${statusBadge}</td>
+        <td>${item.cat}</td>
+        <td style="font-weight:bold; color:#00c9a7">${item.qty}</td>
+        <td>${item.min}</td>
+        <td><button onclick="deleteItem(${index})" style="background:#ff6b6b; padding:2px 8px; font-size:11px; width:auto; margin:0;">حذف</button></td>
+      </tr>`;
+  });
+
+  // بناء جدول الحركات (التقرير)
+  const repTable = document.getElementById('rep-table');
+  repTable.innerHTML = '';
+  db.movs.slice().reverse().forEach(m => {
+    let typeBadge = m.type === 'وارد' ? '<span class="badge in">وارد</span>' : '<span class="badge out">صادر</span>';
+    repTable.innerHTML += `<tr><td>${m.date}</td><td>${m.name}</td><td>${typeBadge}</td><td>${m.qty}</td></tr>`;
+  });
+}
+
+// إضافة مادة جديدة للمخزن
+function addItem(){
+  const name = document.getElementById('p-name').value.trim();
+  const cat = document.getElementById('p-cat').value;
+  const qty = parseInt(document.getElementById('p-qty').value) || 0;
+  const min = parseInt(document.getElementById('p-min').value) || 0;
+
+  if(!name){ alert('يرجى كتابة اسم المادة!'); return; }
+
+  db.items.push({name, cat, qty, min});
+  SV(); RA();
+  
+  // إعادة تصفير الحقول المكتوبة
+  document.getElementById('p-name').value = '';
+  document.getElementById('p-qty').value = '0';
+  alert('تمت إضافة المادة بنجاح!');
+}
+
+// حذف مادة
+function deleteItem(index){
+  if(confirm('هل أنت متأكد من حذف هذه المادة نهائياً؟')) {
+    db.items.splice(index, 1);
+    SV(); RA();
+  }
+}
+
+// تسجيل حركة وارد أو صادر
+function addMovement(){
+  const itemIndex = document.getElementById('m-item').value;
+  const type = document.getElementById('m-type').value;
+  const qty = parseInt(document.getElementById('m-qty').value) || 0;
+
+  if(itemIndex === "" || qty <= 0){ alert('تأكد من اختيار المادة وإدخال كمية صحيحة'); return; }
+
+  let item = db.items[itemIndex];
+
+  if(type === 'صادر' && item.qty < qty){
+    alert(`المخزون غير كافٍ! المتوفر حالياً هو: ${item.qty}`);
+    return;
+  }
+
+  // تعديل الكمية بالمخزن
+  if(type === 'وارد') { item.qty += qty; } else { item.qty -= qty; }
+
+  // تسجيل الحركة بالتقرير
+  const dateStr = new Date().toLocaleDateString('ar-SA', {hour:'2-digit', minute:'2-digit'});
+  db.movs.push({date: dateStr, name: item.name, type: type, qty: qty});
+
+  SV(); RA();
+  alert('تم تسجيل الحركة بنجاح وتحديث الكميات!');
+}
+
+// حفظ الإعدادات العامة
+function saveSettings(){
+  db.cfg.co = document.getElementById('c-co').value;
+  db.cfg.wo = document.getElementById('c-wo').value;
+  SV(); RA();
+  alert('تم حفظ الإعدادات!');
+}
+
+// مسح شامل لكل البيانات
+function clearAllData(){
+  if(confirm('تحذير! سيتم حذف كل المواد المسجلة والحركات المسجلة نهائياً.')){
+    localStorage.removeItem('wdb');
+    db = {items: [], cats: ['عام', 'مواد خام', 'معدات', 'مستلزمات', 'قطع غيار'], movs: [], cfg: {co: 'شركتك', wo: 'المستودع الرئيسي'}};
+    SV(); RA();
+  }
+}
+
+// تشغيل عند التحميل لأول مرة
 init();
 </script>
 
