@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>جرد المستودعات</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',sans-serif;background:#0f1923;color:#e8f0fe;min-height:100vh}
+.h{background:#162030;border-bottom:1px solid #253545;padding:14px 16px;position:sticky;top:0;z-index:99;display:flex;justify-content:space-between;align-items:center}
+.ht{font-size:17px;font-weight:700;color:#00c9a7}
+.hs{font-size:11px;color:#8fa3b8}
+.tabs{display:flex;background:#162030;border-bottom:1px solid #253545;overflow-x:auto}
+.tab{flex:1;min-width:70px;padding:10px 6px;text-align:center;font-size:11px;font-weight:600;color:#8fa3b8;cursor:pointer;border-bottom:2px solid transparent}
+.tab.active{color:#00c9a7;border-bottom-color:#00c9a7}
+/* أضف باقي CSS كما في الكود الأصلي هنا */
+</style>
+</head>
+<body>
+
+<div class="h">
+  <div>
+    <div class="ht">🏭 جرد المستودعات</div>
+    <div class="hs" id="cn">شركتك — المستودع الرئيسي</div>
+  </div>
+  <div id="hd" style="font-size:10px;color:#8fa3b8"></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="ST('db',this)"><span class="ti">📊</span>الرئيسية</div>
+  <div class="tab" onclick="ST('inv',this)"><span class="ti">📦</span>المخزون</div>
+  <div class="tab" onclick="ST('mov',this)"><span class="ti">🔄</span>الحركات</div>
+  <div class="tab" onclick="ST('rep',this)"><span class="ti">📋</span>تقارير</div>
+  <div class="tab" onclick="ST('set',this)"><span class="ti">⚙️</span>إعدادات</div>
+</div>
+
+<!-- أضف باقي الصفحات والمودالز كما في الكود الأصلي -->
+
+<script>
+let db={items:[],cats:['عام','مواد خام','معدات','مستلزمات','قطع غيار'],movs:[],cfg:{co:'شركتك',wo:'المستودع الرئيسي',mo:'',dm:10}};
+let cf='all',mf='all';
+function init(){LD();SD();RA();PCC();USC();}
+function SD(){const n=new Date();document.getElementById('hd').textContent=n.toLocaleDateString('ar-SA',{month:'short',day:'numeric'});}
+function LD(){const s=localStorage.getItem('wdb');if(s)try{db=JSON.parse(s);}catch(e){}}
+function SV(){localStorage.setItem('wdb',JSON.stringify(db));}
+function RA(){UD();RI();RMV();RR();US();document.getElementById('cn').textContent=db.cfg.co+' — '+db.cfg.wo;}
+/* أضف باقي JS الخاص بإدارة المخزون والحركات كما في الكود الأصلي */
+init();
+</script>
+
+</body>
+</html>
